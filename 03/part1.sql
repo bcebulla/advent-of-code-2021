@@ -1,3 +1,8 @@
+create temp function binary2int(x string) returns int64
+language js as r'''
+  return parseInt(x, 2);
+''';
+
 WITH gamma AS (
     SELECT 
         PERCENTILE_DISC(column1, 0.5) OVER () AS c1 
@@ -32,34 +37,39 @@ WITH gamma AS (
     FROM `advent-of-code-333818.2021.input_d3` 
 )
 
-SELECT 
-    concat(
-        max(g.c1)
-        , max(g.c2)
-        , max(g.c3)
-        , max(g.c4)
-        , max(g.c5)
-        , max(g.c6)
-        , max(g.c7)
-        , max(g.c8)
-        , max(g.c9)
-        , max(g.c10)
-        , max(g.c11)
-        , max(g.c12)
-        ) as gamma_rate
-    , concat(
-        max(e.c1)
-        , max(e.c2)
-        , max(e.c3)
-        , max(e.c4)
-        , max(e.c5)
-        , max(e.c6)
-        , max(e.c7)
-        , max(e.c8)
-        , max(e.c9)
-        , max(e.c10)
-        , max(e.c11)
-        , max(e.c12)
-        ) as epsilon_rate
-FROM gamma g
-CROSS JOIN epsilon e
+, both_values AS (
+    SELECT 
+        concat(
+            max(g.c1)
+            , max(g.c2)
+            , max(g.c3)
+            , max(g.c4)
+            , max(g.c5)
+            , max(g.c6)
+            , max(g.c7)
+            , max(g.c8)
+            , max(g.c9)
+            , max(g.c10)
+            , max(g.c11)
+            , max(g.c12)
+            ) as gamma_rate
+        , concat(
+            max(e.c1)
+            , max(e.c2)
+            , max(e.c3)
+            , max(e.c4)
+            , max(e.c5)
+            , max(e.c6)
+            , max(e.c7)
+            , max(e.c8)
+            , max(e.c9)
+            , max(e.c10)
+            , max(e.c11)
+            , max(e.c12)
+            ) as epsilon_rate
+    FROM gamma g
+    CROSS JOIN epsilon e
+)
+
+SELECT binary2int(epsilon_rate)*binary2int(gamma_rate)
+FROM both_values
